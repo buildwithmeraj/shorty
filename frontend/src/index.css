@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+h2 {
+  @apply text-3xl font-bold;
+}
