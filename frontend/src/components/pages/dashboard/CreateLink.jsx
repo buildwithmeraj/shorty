@@ -1,24 +1,29 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { FaRandom } from "react-icons/fa";
+import { FaInfo, FaRandom } from "react-icons/fa";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { Link } from "react-router";
+import Warning from "../../utilities/Warning";
 import Success from "../../utilities/Success";
 import Error from "../../utilities/Error";
 import CreateImage from "../../../assets/images/create.png";
+import WarningImage from "../../../assets/images/warning.png";
 import useAxiosSecure from "../../../hooks/useAxiosSecureInstance";
-import { Link } from "react-router";
+import { BsStars } from "react-icons/bs";
+
 const SUCCESS_LOTTIE =
   "https://lottie.host/027b3643-28c4-4f6e-b7d9-5836e3d33a90/gqu4sL4del.json";
 
 const CreateLink = () => {
   const axiosSecure = useAxiosSecure();
-
   const [isCreated, setIsCreated] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [originalURL, setOriginalURL] = useState(null);
-  const [shortenedURL, setShortenedURL] = useState(null);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [originalURL, setOriginalURL] = useState("");
+  const [shortenedTag, setShortenedTag] = useState("");
+  const [totalLinks, setTotalLinks] = useState(0);
 
   const {
     register,
@@ -28,32 +33,7 @@ const CreateLink = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = useCallback(
-    async (data) => {
-      setLoading(true);
-      setServerError(null);
-
-      try {
-        await axiosSecure.post("/shorten", {
-          targetURL: data.targetURL.trim(),
-          shortenTag: data.shortenTag.trim(),
-        });
-        setIsCreated(true);
-        setShowSuccessModal(true);
-        setOriginalURL(data.targetURL.trim());
-        setShortenedURL(data.shortenTag.trim());
-      } catch (error) {
-        setServerError(
-          error.response?.data?.message || "Failed to create short link"
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [axiosSecure]
-  );
-
-  const generateRandom = useCallback(() => {
+  const generateRandomTag = useCallback(() => {
     let result = "";
     for (let i = 0; i < import.meta.env.VITE_RANDOM_TAG_LENGTH; i++) {
       result += import.meta.env.VITE_ALPHANUMERIC_CHARS[
@@ -65,27 +45,6 @@ const CreateLink = () => {
     setValue("shortenTag", result, { shouldValidate: true });
   }, [setValue]);
 
-  const resetAll = useCallback(() => {
-    reset();
-    setIsCreated(false);
-    setServerError(null);
-    setLoading(false);
-    setOriginalURL(null);
-    setShortenedURL(null);
-  }, [reset]);
-
-  const copyURL = useCallback(() => {
-    const fullShortenedURL = `${window.location.origin}/${shortenedURL}`;
-    navigator.clipboard.writeText(fullShortenedURL).then(
-      () => {
-        alert("Shortened URL copied to clipboard!");
-      },
-      (err) => {
-        alert("Failed to copy the URL: ", err);
-      }
-    );
-  }, [shortenedURL]);
-
   const validateURL = useCallback((value) => {
     try {
       new URL(value);
@@ -95,29 +54,90 @@ const CreateLink = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (showSuccessModal) {
-      const timer = setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 4100);
-      return () => clearTimeout(timer);
+  const fetchTotalLinks = useCallback(async () => {
+    try {
+      const res = await axiosSecure.get("/links/total");
+      setTotalLinks(res.data.totalLinks ?? 0);
+    } catch (err) {
+      console.error("Failed to fetch total links", err);
     }
-  }, [showSuccessModal]);
+  }, [axiosSecure]);
+
+  const resetAll = useCallback(() => {
+    reset();
+    setIsCreated(false);
+    setServerError(null);
+    setOriginalURL("");
+    setShortenedTag("");
+  }, [reset]);
+
+  const copyURL = useCallback(() => {
+    const fullURL = `${window.location.origin}/${shortenedTag}`;
+    navigator.clipboard.writeText(fullURL);
+  }, [shortenedTag]);
+
+  const onSubmit = async (data) => {
+    setSubmitting(true);
+    setServerError(null);
+
+    try {
+      await axiosSecure.post("/shorten", {
+        targetURL: data.targetURL.trim(),
+        shortenTag: data.shortenTag.trim(),
+      });
+
+      setOriginalURL(data.targetURL.trim());
+      setShortenedTag(data.shortenTag.trim());
+      setIsCreated(true);
+      setShowSuccessModal(true);
+      fetchTotalLinks();
+    } catch (err) {
+      setServerError(
+        err.response?.data?.message || "Failed to create short link"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   useEffect(() => {
-    generateRandom();
-  }, [generateRandom]);
+    generateRandomTag();
+    fetchTotalLinks();
+  }, [generateRandomTag, fetchTotalLinks]);
+
+  useEffect(() => {
+    if (totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER) {
+      setShowLimitModal(true);
+    }
+  }, [totalLinks]);
+
+  useEffect(() => {
+    if (!showSuccessModal) return;
+    const timer = setTimeout(() => setShowSuccessModal(false), 4100);
+    return () => clearTimeout(timer);
+  }, [showSuccessModal]);
+
+  const fullShortURL = shortenedTag
+    ? `${window.location.origin}/${shortenedTag}`
+    : "";
 
   return (
-    <div className="h-screen">
-      <div className="card lg:card-side bg-base-200 shadow-sm min-w-75 max-w-5xl flex items-center justify-center mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+    <div className="h-[78dvh]">
+      <div className="card lg:card-side bg-base-200 shadow-sm min-w-75  max-w-5xl mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <figure className="hidden lg:flex lg:w-1/2 items-center justify-center">
-          <img src={CreateImage} alt="Create Link" className="max-h-120" />
+          <img
+            src={
+              totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER
+                ? WarningImage
+                : CreateImage
+            }
+            alt="Create Link"
+            className="max-h-120 object-contain"
+          />
         </figure>
 
-        <div className="card-body lg:w-1/2">
-          <div className="flex justify-center">
-            <h2 className="card-title">Create Link</h2>
-          </div>
+        <div className="card-body lg:w-1/2 flex items-center justify-center">
+          <h2 className="card-title justify-center">Create Link</h2>
 
           {serverError && <Error message={serverError} />}
 
@@ -131,8 +151,8 @@ const CreateLink = () => {
                     className={`input w-full ${
                       errors.targetURL ? "input-error" : ""
                     }`}
-                    placeholder="https://example.com/very-long-url"
-                    disabled={loading}
+                    placeholder="https://example.com"
+                    disabled={submitting}
                     {...register("targetURL", {
                       required: "Target URL is required",
                       validate: validateURL,
@@ -146,107 +166,95 @@ const CreateLink = () => {
                 </div>
 
                 <div>
-                  <label className="label">Shorten URL (Tag)</label>
-                  <div className="flex items-center gap-2">
+                  <label className="label">Shorten Tag</label>
+                  <div className="flex gap-2">
                     <input
                       type="text"
+                      id="currentTag"
+                      readOnly
                       className={`input w-full ${
                         errors.shortenTag ? "input-error" : ""
                       }`}
-                      placeholder="short"
-                      readOnly
                       {...register("shortenTag", {
-                        required: "Short tag is required",
-                        minLength: {
-                          value: 6,
-                          message: "Must be at least 6 characters",
-                        },
-                        maxLength: {
-                          value: 8,
-                          message: "Must be at most 8 characters",
-                        },
-                        pattern: {
-                          value: /^[a-zA-Z0-9]+$/,
-                          message: "Only alphanumeric characters are allowed",
-                        },
+                        required: true,
+                        minLength: 6,
+                        maxLength: 8,
+                        pattern: /^[a-zA-Z0-9]+$/,
                       })}
                     />
                     <button
                       type="button"
                       className="btn btn-primary btn-circle"
-                      onClick={generateRandom}
-                      disabled={loading}
-                      aria-label="Generate random tag"
+                      onClick={generateRandomTag}
+                      disabled={submitting}
                     >
                       <FaRandom />
                     </button>
                   </div>
-                  {errors.shortenTag && (
-                    <p className="text-error text-sm mt-1">
-                      {errors.shortenTag.message}
-                    </p>
-                  )}
                 </div>
+
+                <div className="alert alert-success alert-soft rounded-lg mt-4 font-semibold">
+                  <BsStars className="inline -mr-3" size={18} /> Shortened URL:{" "}
+                  {window.location.origin}/
+                  {document.getElementById("currentTag")?.value}
+                </div>
+
                 <button
                   type="submit"
-                  className="btn btn-info mt-4 hover:btn-success"
-                  disabled={loading}
+                  className="btn btn-info mt-4"
+                  disabled={
+                    submitting ||
+                    totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER
+                  }
                 >
-                  {loading ? "Shortening..." : "Create Link"}
+                  {submitting ? "Shortening..." : "Create Link"}
                 </button>
+                {totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER && (
+                  <>
+                    <Warning message="You have reached the maximum number of links allowed. You must upgrade your plan or delete some existing links to create more links." />
+                    <p className="text-center">
+                      <Link className="btn btn-primary" to="/dashboard">
+                        Dashboard
+                      </Link>
+                    </p>
+                  </>
+                )}
               </fieldset>
             </form>
           ) : (
-            <div className="flex flex-col items-center justify-center">
+            <div className="space-y-4 text-center">
               <Success message="Link created successfully!" />
 
-              <div>
-                <label className="label">Original URL</label>
-                <input
-                  type="url"
-                  id="originalURL"
-                  className="input w-full"
-                  name="originalURL"
-                  defaultValue={originalURL}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="label">Shortened URL</label>
-                <input
-                  type="url"
-                  id="shortenedURL"
-                  className="input w-full"
-                  name="shortenedURL"
-                  defaultValue={shortenedURL}
-                  readOnly
-                />
-              </div>
-              <div className="flex items-center gap-2 mt-4">
-                <button onClick={copyURL} className="btn btn-success">
+              <input className="input w-full" readOnly value={originalURL} />
+
+              <input className="input w-full" readOnly value={fullShortURL} />
+
+              <div className="flex gap-2 justify-center">
+                <button className="btn btn-success" onClick={copyURL}>
                   Copy URL
                 </button>
                 <a
-                  href={`/${shortenedURL}`}
-                  className="btn btn-info"
+                  href={fullShortURL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="btn btn-info"
                 >
-                  Visit Link
+                  Visit
                 </a>
               </div>
-              <div className="flex items-center gap-2 mt-4">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={resetAll}
-                >
+
+              <div className="flex gap-2 justify-center">
+                <button className="btn btn-primary" onClick={resetAll}>
                   Create Another
                 </button>
-                <Link to="/dashboard" className="btn btn-info">
-                  Go to Dashboard
+                <Link to="/dashboard" className="btn btn-outline">
+                  Dashboard
                 </Link>
               </div>
+
+              <p className="text-sm opacity-70">
+                Total links created: {totalLinks}
+              </p>
             </div>
           )}
         </div>
@@ -254,13 +262,39 @@ const CreateLink = () => {
 
       {showSuccessModal && (
         <dialog className="modal modal-open">
-          <div className="modal-box flex items-center justify-center">
+          <div className="modal-box flex justify-center">
             <DotLottieReact
               src={SUCCESS_LOTTIE}
               autoplay
               loop={false}
-              className="w-80 h-80"
+              className="w-72 h-72"
             />
+          </div>
+        </dialog>
+      )}
+
+      {showLimitModal && (
+        <dialog className="modal modal-open">
+          <div className="modal-box flex flex-col items-center text-center">
+            <img
+              src={WarningImage}
+              alt="Warning"
+              className="w-72 h-72 object-contain"
+            />
+
+            <p className="text-warning mt-4">
+              You have reached the maximum number of links allowed. Upgrade your
+              plan or delete existing links to continue.
+            </p>
+
+            <div className="modal-action">
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowLimitModal(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </dialog>
       )}

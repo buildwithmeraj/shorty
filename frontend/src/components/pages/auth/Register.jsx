@@ -98,10 +98,14 @@ const Register = () => {
   };
   if (authLoading) return <Loading />;
   return (
-    <div className="h-screen">
+    <div className="h-[78dvh]">
       <div className="card lg:card-side bg-base-200 shadow-sm min-w-75 max-w-4xl flex items-center justify-center mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <figure className="hidden lg:flex lg:w-1/2">
-          <img src={registerImage} alt="Register" className="max-h-150" />
+          <img
+            src={registerImage}
+            alt="Register"
+            className="max-h-150 object-contain"
+          />
         </figure>
         <div className="card-body lg:w-1/2">
           <div className="flex justify-center">

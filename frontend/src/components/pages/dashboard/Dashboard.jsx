@@ -55,7 +55,7 @@ const Dashboard = () => {
   if (loading) return <Loading />;
   return (
     <>
-      <h2>Dashboard</h2>
+      <h2 className="text-center mb-6">Dashboard</h2>
       {links.length === 0 ? (
         <p>No links created yet.</p>
       ) : (
