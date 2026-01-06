@@ -5,6 +5,7 @@ import Login from "../components/pages/auth/Login";
 import Register from "../components/pages/auth/Register";
 import Dashboard from "../components/pages/dashboard/Dashboard";
 import PrivateRoutes from "./PrivateRoutes";
+import CreateLink from "../components/pages/dashboard/CreateLink";
 const routes = createBrowserRouter([
   {
     Component: Root,
@@ -17,6 +18,14 @@ const routes = createBrowserRouter([
         element: (
           <PrivateRoutes>
             <Dashboard />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "create",
+        element: (
+          <PrivateRoutes>
+            <CreateLink />
           </PrivateRoutes>
         ),
       },
