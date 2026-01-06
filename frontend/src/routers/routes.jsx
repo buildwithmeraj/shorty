@@ -6,6 +6,7 @@ import Register from "../components/pages/auth/Register";
 import Dashboard from "../components/pages/dashboard/Dashboard";
 import PrivateRoutes from "./PrivateRoutes";
 import CreateLink from "../components/pages/dashboard/CreateLink";
+
 const routes = createBrowserRouter([
   {
     Component: Root,
@@ -31,5 +32,37 @@ const routes = createBrowserRouter([
       },
     ],
   },
+  // Short URL redirector - outside Root layout
+  {
+    path: ":shortTag",
+    loader: async ({ params }) => {
+      const { shortTag } = params;
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/links/${shortTag}`
+        );
+
+        if (!res.ok) {
+          return { error: "Short URL not found", shortTag };
+        }
+
+        const data = await res.json();
+
+        if (data.targetURL) {
+          // Redirect immediately
+          window.location.href = data.targetURL;
+          return null;
+        }
+
+        return { error: "Invalid short URL", shortTag };
+      } catch (error) {
+        return {
+          error: `Failed to load short URL: ${shortTag}, Error: ${error.message}`,
+        };
+      }
+    },
+  },
 ]);
+
 export default routes;
