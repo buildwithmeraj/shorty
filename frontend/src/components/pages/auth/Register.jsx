@@ -96,6 +96,11 @@ const Register = () => {
         setRegisterError(errMsg);
       });
   };
+
+  useEffect(() => {
+    document.title = `Register - ${import.meta.env.VITE_SITE_NAME}`;
+  });
+
   if (authLoading) return <Loading />;
   return (
     <div className="h-[78dvh]">

@@ -50,6 +50,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchLinks();
+    document.title = `Dashboard - ${import.meta.env.VITE_SITE_NAME}`;
   });
 
   if (loading) return <Loading />;

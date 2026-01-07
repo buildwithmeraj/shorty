@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router";
 import toast from "react-hot-toast";
@@ -79,6 +79,10 @@ const Login = () => {
         setError(match ? match.message : "Login failed. Please try again.");
       });
   };
+
+  useEffect(() => {
+    document.title = `Login - ${import.meta.env.VITE_SITE_NAME}`;
+  });
 
   if (authLoading) return <Loading />;
 

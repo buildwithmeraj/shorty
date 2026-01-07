@@ -7,3 +7,7 @@ h2 {
 label:not(.swap) {
   @apply block;
 }
+
+.active {
+  @apply font-semibold text-primary;
+}

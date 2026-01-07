@@ -12,6 +12,8 @@
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.17.12",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/styled-components": "^5.1.36",
+    "animate.css": "^4.1.1",
     "axios": "^1.13.2",
     "daisyui": "^5.5.14",
     "firebase": "^12.7.0",
@@ -22,6 +24,7 @@
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-router": "^7.11.0",
+    "styled-components": "^6.2.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

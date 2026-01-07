@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { FaInfo, FaRandom } from "react-icons/fa";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { FaRandom } from "react-icons/fa";
 import { Link } from "react-router";
 import Warning from "../../utilities/Warning";
 import Success from "../../utilities/Success";
 import Error from "../../utilities/Error";
 import CreateImage from "../../../assets/images/create.png";
 import WarningImage from "../../../assets/images/warning.png";
+import DoneImage from "../../../assets/images/done.png";
 import useAxiosSecure from "../../../hooks/useAxiosSecureInstance";
 import { BsStars } from "react-icons/bs";
-
-const SUCCESS_LOTTIE =
-  "https://lottie.host/027b3643-28c4-4f6e-b7d9-5836e3d33a90/gqu4sL4del.json";
+import "animate.css";
 
 const CreateLink = () => {
   const axiosSecure = useAxiosSecure();
@@ -103,6 +101,7 @@ const CreateLink = () => {
   useEffect(() => {
     generateRandomTag();
     fetchTotalLinks();
+    document.title = `Create Link - ${import.meta.env.VITE_SITE_NAME}`;
   }, [generateRandomTag, fetchTotalLinks]);
 
   useEffect(() => {
@@ -126,13 +125,22 @@ const CreateLink = () => {
       <div className="card lg:card-side bg-base-200 shadow-sm min-w-75  max-w-5xl mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <figure className="hidden lg:flex lg:w-1/2 items-center justify-center">
           <img
+            key={
+              totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER
+                ? "limit"
+                : isCreated
+                ? "done"
+                : "create"
+            }
             src={
               totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER
                 ? WarningImage
+                : isCreated
+                ? DoneImage
                 : CreateImage
             }
             alt="Create Link"
-            className="max-h-120 object-contain"
+            className="max-h-120 object-contain animate__animated animate__bounceIn"
           />
         </figure>
 
@@ -259,19 +267,6 @@ const CreateLink = () => {
           )}
         </div>
       </div>
-
-      {showSuccessModal && (
-        <dialog className="modal modal-open">
-          <div className="modal-box flex justify-center">
-            <DotLottieReact
-              src={SUCCESS_LOTTIE}
-              autoplay
-              loop={false}
-              className="w-72 h-72"
-            />
-          </div>
-        </dialog>
-      )}
 
       {showLimitModal && (
         <dialog className="modal modal-open">

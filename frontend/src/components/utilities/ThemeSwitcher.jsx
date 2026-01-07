@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import styled from "styled-components";
 
 const ThemeSwitcher = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
 
   useEffect(() => {
-    document.querySelector("html").setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
@@ -13,30 +16,120 @@ const ThemeSwitcher = () => {
   };
 
   return (
-    <label className="swap swap-rotate btn btn-circle btn-active">
-      <input
-        type="checkbox"
-        onChange={handleToggle}
-        checked={theme === "dark"}
-      />
+    <Wrapper>
+      <label className="switch">
+        <span className="sun">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g fill="#ffd43b">
+              <circle cx="12" cy="12" r="5" />
+              <path d="m21 13h-1a1 1 0 1 1 0-2h1a1 1 0 1 1 0 2zm-17 0h-1a1 1 0 1 1 0-2h1a1 1 0 1 1 0 2zm13.66-5.66a1 1 0 0 1-.66-.29 1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1-.75.29z" />
+            </g>
+          </svg>
+        </span>
 
-      <svg
-        className="swap-off h-5 w-5 fill-current text-base-500"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-      >
-        <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
-      </svg>
+        <span className="moon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+            <path d="m223.5 32c-123.5 0-223.5 100.3-223.5 224s100 224 223.5 224c60.6 0 115.5-24.2 155.8-63.4 5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6-96.9 0-175.5-78.8-175.5-176 0-65.8 36-123.1 89.3-153.3 6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
+          </svg>
+        </span>
 
-      <svg
-        className="swap-on h-5 w-5 fill-current text-base-500"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-      >
-        <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
-      </svg>
-    </label>
+        <input
+          type="checkbox"
+          className="input"
+          checked={theme === "dark"}
+          onChange={handleToggle}
+          aria-label="Toggle theme"
+        />
+
+        <span className="slider" />
+      </label>
+    </Wrapper>
   );
 };
 
 export default ThemeSwitcher;
+
+const Wrapper = styled.div`
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 64px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #73c0fc;
+    transition: 0.4s;
+    border-radius: 30px;
+  }
+
+  .slider::before {
+    content: "";
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #e8e8e8;
+    transition: 0.4s;
+    border-radius: 20px;
+    z-index: 2;
+  }
+
+  .sun svg {
+    position: absolute;
+    top: 6px;
+    left: 36px;
+    width: 24px;
+    height: 24px;
+    z-index: 1;
+    animation: rotate 15s linear infinite;
+  }
+
+  .moon svg {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 24px;
+    height: 24px;
+    fill: #73c0fc;
+    z-index: 1;
+    animation: tilt 5s linear infinite;
+  }
+
+  .input:checked + .slider {
+    background-color: #183153;
+  }
+
+  .input:checked + .slider::before {
+    transform: translateX(30px);
+  }
+
+  @keyframes rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes tilt {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-10deg);
+    }
+    75% {
+      transform: rotate(10deg);
+    }
+  }
+`;
