@@ -71,7 +71,9 @@ const Dashboard = () => {
         </Link>
       </div>
       {links.length === 0 ? (
-        <p>No links created yet.</p>
+        <p className="text-center text-lg font-semibold text-base-content/60">
+          No links created yet.
+        </p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-base-content/20 bg-base-100/40 backdrop-blur-sm">
           <table className="table">
