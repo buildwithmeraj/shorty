@@ -11,7 +11,7 @@ A minimal URL shortener built with:
 ## Live Site
 
 - Frontend - [Live Link](https://shorty-m.pages.dev/)
-- Backend - [Live Link](https://shorty-phg4796lo-bwms-projects-c9b75e40.vercel.app/)
+- Backend - [Live Link](https://shorty-api-beta.vercel.app/)
 
 ---
 
