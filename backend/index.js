@@ -25,7 +25,7 @@ admin.initializeApp({
 // set CORS options
 app.use(
   cors({
-    origin: "http://shorty-m.pages.dev",
+    origin: "https://shorty-m.pages.dev",
     credentials: true,
   })
 );

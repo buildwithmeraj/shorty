@@ -101,7 +101,16 @@ const Dashboard = () => {
                     </div>
                   </td>
 
-                  <td>{link.shortenTag}</td>
+                  <td className="max-w-s">
+                    <div
+                      className="tooltip tooltip-top wrap-anywhere"
+                      data-tip={link.shortenTag}
+                    >
+                      <span className="block truncate max-w-xs cursor-help">
+                        {link.shortenTag}
+                      </span>
+                    </div>
+                  </td>
                   <td>
                     <a
                       href={`${import.meta.env.VITE_SITE_URL}/${
