@@ -24,13 +24,13 @@ const Example = () => {
 
       <div className="grid md:grid-cols-2 gap-4 relative">
         <div className="rounded-lg break-all p-4 bg-base-200">
-          <div className="text-sm mb-2">Original (very long) URL</div>
+          <div className="font-semibold mb-2">Original (very long) URL</div>
           <div className="text-xs leading-relaxed link">{longUrl}</div>
         </div>
 
         <div className="rounded-lg bg-base-200 flex flex-col gap-3 items-start p-4">
-          <div className="text-sm">Shortened URL (generated)</div>
-          <div className="flex items-center gap-3">
+          <div className="font-semibold">Shortened URL (generated)</div>
+          <div className="flex flex-col lg:flex-row items-center gap-3">
             <a rel="noreferrer" className="text-primary font-mono text-lg link">
               {shortUrl}
             </a>
@@ -47,8 +47,8 @@ const Example = () => {
         </div>
         <div className="absolute bottom-[50%] left-[50%] h-1">
           <ImArrowRight
-            size={24}
-            className="-ml-3 -mt-3 lg:-mt-2 opacity-35 rotate-90 lg:rotate-0 text-secondary"
+            size={32}
+            className="-ml-4 -mt-3 lg:-mt-2 opacity-50 rotate-90 lg:rotate-0 text-secondary"
           />
         </div>
       </div>

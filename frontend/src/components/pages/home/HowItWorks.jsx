@@ -9,7 +9,7 @@ const HowItWorks = () => {
       {" "}
       <h2 className="text-center mt-6">How it Works</h2>
       <div className="py-6 max-w-7xl min-h-fit mx-auto justify-center justify-items-center items-center grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div className="hover-3d w-full min-h-72">
+        <div className="hover-3d w-full min-h-72 backdrop-blur-sm">
           <div className="bg-primary/10 p-6 rounded-lg relative">
             <span className="text-3xl font-bold">Step 1</span>
             <p className="">
@@ -31,7 +31,7 @@ const HowItWorks = () => {
           <div></div>
         </div>
 
-        <div className="hover-3d w-full min-h-72">
+        <div className="hover-3d w-full min-h-72 backdrop-blur-sm">
           <div className="bg-primary/10 p-6 rounded-lg relative">
             <span className="text-3xl font-bold">Step 2</span>
             <p className="">
@@ -54,8 +54,8 @@ const HowItWorks = () => {
           <div></div>
         </div>
 
-        <div className="hover-3d w-full min-h-72">
-          <div className="bg-primary/10 p-6 rounded-lg relative">
+        <div className="hover-3d w-full min-h-72 backdrop-blur-sm">
+          <div className="bg-primary/10 p-6 rounded-lg relative backdrop-blur-sm">
             <span className="text-3xl font-bold">Step 3</span>
             <p className="">
               When user hits the short URL, we log the click and update the
@@ -77,7 +77,7 @@ const HowItWorks = () => {
           <div></div>
         </div>
 
-        <div className="hover-3d w-full min-h-72">
+        <div className="hover-3d w-full min-h-72 backdrop-blur-sm">
           <div className="bg-primary/10 p-6 rounded-lg relative">
             <span className="text-3xl font-bold">Step 4</span>
             <p className="">

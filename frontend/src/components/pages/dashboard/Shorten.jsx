@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { set, useForm, useWatch } from "react-hook-form";
-import { FaExternalLinkSquareAlt, FaRandom } from "react-icons/fa";
+import { useForm, useWatch } from "react-hook-form";
+import { FaRandom } from "react-icons/fa";
 import { Link } from "react-router";
 import Warning from "../../utilities/Warning";
 import Success from "../../utilities/Success";

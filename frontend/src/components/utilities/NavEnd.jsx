@@ -1,10 +1,12 @@
 import React from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
-import { FaUserCircle } from "react-icons/fa";
+import { FaSignInAlt, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../contexts/AuthContext";
 import defaultAvatar from "../../assets/images/user.png";
 import { Link } from "react-router";
 import toast from "react-hot-toast";
+import { FaUserPlus } from "react-icons/fa6";
+import { ImStatsDots } from "react-icons/im";
 const NavEnd = () => {
   const { user, logOut, authLoading } = useAuth();
   const handleLogout = () => {
@@ -38,16 +40,31 @@ const NavEnd = () => {
           {user ? (
             <>
               <li>
-                <Link to="/dashboard">Dashboard</Link>
+                <Link to="/dashboard">
+                  <ImStatsDots />
+                  Dashboard
+                </Link>
               </li>
               <li>
-                <button onClick={handleLogout}>Logout</button>
+                <button onClick={handleLogout} className="text-error">
+                  <FaSignOutAlt className="mt-0.5" size={18} />
+                  Logout
+                </button>
               </li>
             </>
           ) : (
             <>
               <li>
-                <Link to="/login">Login</Link>
+                <Link to="/login">
+                  <FaSignInAlt className="mt-0.5" />
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/login">
+                  <FaUserPlus className="mt-0.5" />
+                  Register
+                </Link>
               </li>
             </>
           )}

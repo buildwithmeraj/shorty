@@ -3,7 +3,7 @@ import { FaGear } from "react-icons/fa6";
 
 const CTA = () => {
   return (
-    <div className="max-w-7xl bg-primary/10 min-h-fit mx-auto flex items-center rounded-xl flex-col gap-1 p-6 mt-4">
+    <div className="max-w-7xl bg-primary/10 min-h-fit mx-auto flex items-center rounded-xl flex-col gap-1 p-6 mt-4 backdrop-blur-sm">
       <div className="lg:w-3/4 flex items-center flex-col justify-center text-center">
         <h2 className="mt-2 text-2xl font-bold">Ready to get started?</h2>
         <p className="leading-relaxed px-1 lg:px-8 py-4">
