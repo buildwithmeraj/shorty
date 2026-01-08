@@ -9,6 +9,7 @@ import googleIcon from "../../../assets/images/google.png";
 import { TbEye, TbEyeOff } from "react-icons/tb";
 import { FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import Loading from "../../utilities/Loading";
+import "animate.css";
 
 const Login = () => {
   const {
@@ -93,7 +94,7 @@ const Login = () => {
           <img
             src={loginImage}
             alt="Login"
-            className="max-h-150 object-contain"
+            className="max-h-150 object-contain animate__animated animate__bounceIn"
           />
         </figure>
         <div className="card-body lg:w-1/2">

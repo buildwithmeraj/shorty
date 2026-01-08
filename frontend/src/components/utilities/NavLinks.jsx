@@ -3,12 +3,12 @@ import { NavLink } from "react-router";
 
 const NavLinks = () => {
   return (
-    <ul className="flex items-center gap-4">
+    <ul className="items-center gap-4 hidden lg:flex">
       <li>
         <NavLink to="/">Home</NavLink>
       </li>
       <li>
-        <NavLink to="/create">Shorten</NavLink>
+        <NavLink to="/shorten">Shorten</NavLink>
       </li>
     </ul>
   );

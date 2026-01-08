@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
-import { FaRandom } from "react-icons/fa";
+import { set, useForm, useWatch } from "react-hook-form";
+import { FaExternalLinkSquareAlt, FaRandom } from "react-icons/fa";
 import { Link } from "react-router";
 import Warning from "../../utilities/Warning";
 import Success from "../../utilities/Success";
@@ -11,8 +11,11 @@ import DoneImage from "../../../assets/images/done.png";
 import useAxiosSecure from "../../../hooks/useAxiosSecureInstance";
 import { BsStars } from "react-icons/bs";
 import "animate.css";
+import { FaGear } from "react-icons/fa6";
+import { BiSolidCopy } from "react-icons/bi";
+import { ImStatsDots } from "react-icons/im";
 
-const CreateLink = () => {
+const Shorten = () => {
   const axiosSecure = useAxiosSecure();
   const [isCreated, setIsCreated] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +25,7 @@ const CreateLink = () => {
   const [originalURL, setOriginalURL] = useState("");
   const [shortenedTag, setShortenedTag] = useState("");
   const [totalLinks, setTotalLinks] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -29,7 +33,14 @@ const CreateLink = () => {
     setValue,
     reset,
     formState: { errors },
+    control,
   } = useForm();
+
+  const shortenTagValue = useWatch({
+    control,
+    name: "shortenTag",
+    defaultValue: "",
+  });
 
   const generateRandomTag = useCallback(() => {
     let result = "";
@@ -54,10 +65,13 @@ const CreateLink = () => {
 
   const fetchTotalLinks = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await axiosSecure.get("/links/total");
       setTotalLinks(res.data.totalLinks ?? 0);
     } catch (err) {
       console.error("Failed to fetch total links", err);
+    } finally {
+      setLoading(false);
     }
   }, [axiosSecure]);
 
@@ -67,10 +81,11 @@ const CreateLink = () => {
     setServerError(null);
     setOriginalURL("");
     setShortenedTag("");
-  }, [reset]);
+    generateRandomTag();
+  }, [reset, generateRandomTag]);
 
   const copyURL = useCallback(() => {
-    const fullURL = `${window.location.origin}/${shortenedTag}`;
+    const fullURL = `${import.meta.env.VITE_SITE_URL}/${shortenedTag}`;
     navigator.clipboard.writeText(fullURL);
   }, [shortenedTag]);
 
@@ -101,7 +116,7 @@ const CreateLink = () => {
   useEffect(() => {
     generateRandomTag();
     fetchTotalLinks();
-    document.title = `Create Link - ${import.meta.env.VITE_SITE_NAME}`;
+    document.title = `Shorten Link - ${import.meta.env.VITE_SITE_NAME}`;
   }, [generateRandomTag, fetchTotalLinks]);
 
   useEffect(() => {
@@ -117,7 +132,7 @@ const CreateLink = () => {
   }, [showSuccessModal]);
 
   const fullShortURL = shortenedTag
-    ? `${window.location.origin}/${shortenedTag}`
+    ? `${import.meta.env.VITE_SITE_URL}/${shortenedTag}`
     : "";
 
   return (
@@ -145,7 +160,7 @@ const CreateLink = () => {
         </figure>
 
         <div className="card-body lg:w-1/2 flex items-center justify-center">
-          <h2 className="card-title justify-center">Create Link</h2>
+          <h2 className="card-title justify-center">Shorten Link</h2>
 
           {serverError && <Error message={serverError} />}
 
@@ -175,7 +190,7 @@ const CreateLink = () => {
 
                 <div>
                   <label className="label">Shorten Tag</label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <input
                       type="text"
                       id="currentTag"
@@ -184,85 +199,132 @@ const CreateLink = () => {
                         errors.shortenTag ? "input-error" : ""
                       }`}
                       {...register("shortenTag", {
-                        required: true,
-                        minLength: 6,
-                        maxLength: 8,
-                        pattern: /^[a-zA-Z0-9]+$/,
+                        required: "Shorten tag is required",
+                        minLength: {
+                          value: 6,
+                          message: "Minimum 6 characters",
+                        },
+                        maxLength: {
+                          value: 8,
+                          message: "Maximum 8 characters",
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z0-9]+$/,
+                          message: "Only alphanumeric characters allowed",
+                        },
                       })}
                     />
                     <button
                       type="button"
-                      className="btn btn-primary btn-circle"
+                      className="btn btn-soft btn-circle"
                       onClick={generateRandomTag}
                       disabled={submitting}
                     >
                       <FaRandom />
                     </button>
                   </div>
+                  {errors.shortenTag && (
+                    <p className="text-error text-sm mt-1">
+                      {errors.shortenTag.message}
+                    </p>
+                  )}
                 </div>
 
-                <div className="alert alert-success alert-soft rounded-lg mt-4 font-semibold">
-                  <BsStars className="inline -mr-3" size={18} /> Shortened URL:{" "}
-                  {window.location.origin}/
-                  {document.getElementById("currentTag")?.value}
+                <div className="alert alert-success alert-soft rounded-lg mt-4 font-semibold text-center relative">
+                  <BsStars
+                    className="absolute top-2 left-3 opacity-20"
+                    size={24}
+                  />
+                  Shortened URL:
+                  <br />
+                  {import.meta.env.VITE_SITE_URL}/{shortenTagValue}
+                  <BsStars
+                    className="absolute bottom-3 right-2 opacity-40"
+                    size={32}
+                  />
+                </div>
+
+                <div className="flex items-center gap-4 my-2">
+                  <div>
+                    Tier: Free ({totalLinks}/
+                    {import.meta.env.VITE_MAX_LINKS_PER_USER})
+                  </div>
+                  <div>
+                    {loading ? (
+                      <progress className="progress w-56"></progress>
+                    ) : (
+                      <progress
+                        className="progress progress-success w-56 mr-2"
+                        value={totalLinks}
+                        max={import.meta.env.VITE_MAX_LINKS_PER_USER}
+                      ></progress>
+                    )}
+                  </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="btn btn-info mt-4"
+                  className="btn btn-success text-white mt-4"
                   disabled={
                     submitting ||
                     totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER
                   }
                 >
-                  {submitting ? "Shortening..." : "Create Link"}
+                  {submitting ? (
+                    <>
+                      <FaGear className="animate-spin" />
+                      Shortening..."
+                    </>
+                  ) : (
+                    <>
+                      <FaGear />
+                      Shorten
+                    </>
+                  )}
                 </button>
+                <div className="divider">OR</div>
+                <Link className="btn btn-primary" to={`/dashboard`}>
+                  <ImStatsDots />
+                  Visit Dashboard
+                </Link>
                 {totalLinks >= import.meta.env.VITE_MAX_LINKS_PER_USER && (
                   <>
                     <Warning message="You have reached the maximum number of links allowed. You must upgrade your plan or delete some existing links to create more links." />
-                    <p className="text-center">
-                      <Link className="btn btn-primary" to="/dashboard">
-                        Dashboard
-                      </Link>
-                    </p>
                   </>
                 )}
               </fieldset>
             </form>
           ) : (
-            <div className="space-y-4 text-center">
+            <div className="space-y-4">
               <Success message="Link created successfully!" />
-
-              <input className="input w-full" readOnly value={originalURL} />
-
-              <input className="input w-full" readOnly value={fullShortURL} />
-
-              <div className="flex gap-2 justify-center">
-                <button className="btn btn-success" onClick={copyURL}>
+              <div>
+                <label className="label">Original URL:</label>
+                <input className="input w-full" readOnly value={originalURL} />
+              </div>
+              <div>
+                <label className="label">Shortened URL:</label>
+                <input className="input w-full" readOnly value={fullShortURL} />
+              </div>
+              <div className="flex gap-2 justify-center items-center">
+                <button
+                  className="btn btn-success flex-1 text-white"
+                  onClick={copyURL}
+                >
+                  <BiSolidCopy />
                   Copy URL
                 </button>
-                <a
-                  href={fullShortURL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-info"
-                >
-                  Visit
-                </a>
-              </div>
-
-              <div className="flex gap-2 justify-center">
-                <button className="btn btn-primary" onClick={resetAll}>
-                  Create Another
-                </button>
-                <Link to="/dashboard" className="btn btn-outline">
+                <Link to="/dashboard" className="btn btn-info text-white">
+                  <ImStatsDots />
                   Dashboard
                 </Link>
               </div>
-
-              <p className="text-sm opacity-70">
-                Total links created: {totalLinks}
-              </p>
+              <div className="divider">OR</div>
+              <div className="flex gap-2 justify-center">
+                <button className="btn btn-primary flex-1" onClick={resetAll}>
+                  <FaGear />
+                  Short Another
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -297,4 +359,4 @@ const CreateLink = () => {
   );
 };
 
-export default CreateLink;
+export default Shorten;

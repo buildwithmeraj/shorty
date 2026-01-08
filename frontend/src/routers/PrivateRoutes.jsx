@@ -17,7 +17,7 @@ const PrivateRoutes = ({ children }) => {
       replace
       state={{
         from: location.pathname,
-        message: "You must login to view this page.",
+        message: "You must login to access this page.",
       }}
     />
   );

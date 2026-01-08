@@ -5,7 +5,7 @@ import Login from "../components/pages/auth/Login";
 import Register from "../components/pages/auth/Register";
 import Dashboard from "../components/pages/dashboard/Dashboard";
 import PrivateRoutes from "./PrivateRoutes";
-import CreateLink from "../components/pages/dashboard/CreateLink";
+import Shorten from "../components/pages/dashboard/Shorten";
 
 const routes = createBrowserRouter([
   {
@@ -23,10 +23,10 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: "create",
+        path: "shorten",
         element: (
           <PrivateRoutes>
-            <CreateLink />
+            <Shorten />
           </PrivateRoutes>
         ),
       },

@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import Loading from "../../utilities/Loading";
 import useAxiosSecure from "../../../hooks/useAxiosSecureInstance";
 import toast from "react-hot-toast";
+import { FaPlus } from "react-icons/fa6";
+import { BiSolidCopy } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
+import { Link } from "react-router";
 
 const Dashboard = () => {
   const [links, setLinks] = useState([]);
@@ -57,6 +61,15 @@ const Dashboard = () => {
   return (
     <>
       <h2 className="text-center mb-6">Dashboard</h2>
+      <div className="flex flex-col md:flex-row items-center justify-between my-3">
+        <h3 className="font-bold text-2xl">
+          Your Links ({links.length}/{import.meta.env.VITE_MAX_LINKS_PER_USER})
+        </h3>
+        <Link className="btn btn-primary" to="/shorten">
+          <FaPlus />
+          Shorten
+        </Link>
+      </div>
       {links.length === 0 ? (
         <p>No links created yet.</p>
       ) : (
@@ -89,32 +102,36 @@ const Dashboard = () => {
                   <td>{link.shortenTag}</td>
                   <td>
                     <a
-                      href={`${window.location.origin}/${link.shortenTag}`}
+                      href={`${import.meta.env.VITE_SITE_URL}/${
+                        link.shortenTag
+                      }`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link"
                     >
-                      {`${window.location.origin}/${link.shortenTag}`}
+                      {`${import.meta.env.VITE_SITE_URL}/${link.shortenTag}`}
                     </a>
                   </td>
                   <td>{link.hits}</td>
                   <td>{new Date(link.createdAt).toLocaleString()}</td>
                   <td>
                     <button
-                      className="btn btn-sm btn-primary mr-2"
+                      className="btn btn-sm btn-primary text-white mr-2"
                       onClick={() => {
                         navigator.clipboard.writeText(
-                          `${window.location.origin}/${link.shortenTag}`
+                          `${import.meta.env.VITE_SITE_URL}/${link.shortenTag}`
                         );
                         toast.success("Shortened URL copied to clipboard!");
                       }}
                     >
+                      <BiSolidCopy />
                       Copy
                     </button>
                     <button
-                      className="btn btn-sm btn-error"
+                      className="btn btn-sm btn-error text-white"
                       onClick={showDeleteModal(link)}
                     >
+                      <MdDelete />
                       Delete
                     </button>
                   </td>
@@ -133,10 +150,16 @@ const Dashboard = () => {
               undone.
             </p>
             <div className="modal-action">
-              <button className="btn btn-error" onClick={handleDelete}>
+              <button
+                className="btn btn-error text-white"
+                onClick={handleDelete}
+              >
                 Delete
               </button>
-              <button className="btn" onClick={() => setShowModal(false)}>
+              <button
+                className="btn btn-soft"
+                onClick={() => setShowModal(false)}
+              >
                 Close
               </button>
             </div>
